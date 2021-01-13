@@ -1,0 +1,22 @@
+--- # Project - install git ##### Steps - Check if folder is present, copy tar, untar, delete tar, list folder,
+
+- hosts: awshosts
+  become: yes
+
+  tasks:
+
+  - name: Copy file with specific and permissions
+    ansible.builtin.copy:
+      src: /home/ec2-user/git.tar
+      dest: /var
+      owner: root
+      group: root
+      mode: '0644'
+
+  - name: Check Date with Shell command
+    shell:
+            "ls -l /var/git.tar"
+    register: lscmd
+    tags: lscmd
+
+  - debug: msg="{{lscmd.stdout}}"
