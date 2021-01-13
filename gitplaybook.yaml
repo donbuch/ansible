@@ -13,7 +13,7 @@
       group: root
       mode: '0644'
 
-  - name: Check Date with Shell command
+  - name: Check for cp success
     shell:
             "ls -l /var/git.tar"
     register: lscmd
@@ -27,8 +27,15 @@
       dest: /var/
       remote_src: yes
 
-  - name: Remove file (delete file)
+  - name: Remove the archive
     ansible.builtin.file:
       path: /var/git.tar
       state: absent
 
+  - name: Check if git-2.6.4 is present
+    shell:
+            "ls -l /var/git-2.6.4"
+    register: lscmd2
+    tags: lscmd2
+
+  - debug: msg="{{lscmd2.stdout}}"

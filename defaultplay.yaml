@@ -1,0 +1,270 @@
+--- # Install wget and vim
+
+- hosts: awshosts
+  become: yes
+
+  tasks:
+  - name: Install wget
+    yum:
+            name:
+            - wget
+            - vim
+            - curl
+            state: latest
+           
+
+
+
+
+###################################################
+
+--- # Webserverrs install
+
+- hosts: play1
+  become: yes
+
+  tasks:
+  - name: Install httpd
+    yum:
+            name: httpd
+            state: latest
+
+  - name: create index.html file with file module
+    file:
+            name: /var/www/html/index.html
+            state: touch
+  - name: add text to the created file with lineinfile module
+    lineinfile:
+            line: "Hello Ansible world"
+            path: /var/www/html/index.html
+  - name: Start httpd service with service module
+    service:
+            name: httpd
+            state: started
+
+- hosts: play2
+  become: yes
+
+  tasks:
+  - name: Install httpd
+    yum:
+            name: httpd
+            state: latest
+
+  - name: create index.html file with file module
+    file:
+            name: /var/www/html/index.html
+            state: touch
+  - name: add text to the created file with lineinfile module
+    lineinfile:
+            line: "Hello Ansible world"
+            path: /var/www/html/index.html
+  - name: Start httpd service with service module
+    service:
+            name: httpd
+            state: started
+            
+            
+##################################################################
+
+--- # Service install with variables - executed via command line - ansible-playbook -i playbookinv playbook1.yaml -e "target_service=httpd"
+
+- hosts: play1
+  become: yes
+
+  tasks:
+  - name: Install "{{ target_service }}"
+    yum:
+            name: "{{ target_service }}"
+            state: latest
+
+  - name: create index.html file with file module
+    file:
+            name: /var/www/html/index.html
+            state: touch
+  - name: add text to the created file with lineinfile module
+    lineinfile:
+            line: "Hello Ansible world"
+            path: /var/www/html/index.html
+  - name: Start httpd service with service module
+    service:
+            name: "{{ target_service }}"
+            state: started
+
+- hosts: play2
+  become: yes
+
+  tasks:
+  - name: Install httpd
+    yum:
+            name: "{{ target_service }}"
+            state: latest
+
+  - name: create index.html file with file module
+    file:
+            name: /var/www/html/index.html
+            state: touch
+  - name: add text to the created file with lineinfile module
+    lineinfile:
+            line: "Hello Ansible world"
+            path: /var/www/html/index.html
+  - name: Start httpd service with service module
+    service:
+            name: "{{ target_service }}"
+            state: started
+            
+#############################################################################################
+##################################################################
+
+--- # Service install using facts - "{{ ansible_hostname }}" as var for line entered in index.html. Default var, collected by ansible facts # ansible-playbook -i playbookinv playbook1.yaml -e "target_service=httpd # gather_facts: no # if you dont want collect facts
+
+
+- hosts: play1
+  become: yes
+
+  tasks:
+  - name: Install "{{ target_service }}"
+    yum:
+            name: "{{ target_service }}"
+            state: latest
+
+  - name: create index.html file with file module
+    file:
+            name: /var/www/html/index.html
+            state: touch
+  - name: add text to the created file with lineinfile module
+    lineinfile:
+            line: "{{ ansible_hostname }}" 
+            path: /var/www/html/index.html
+  - name: Start httpd service with service module
+    service:
+            name: "{{ target_service }}"
+            state: started
+
+- hosts: play2
+  become: yes
+
+  tasks:
+  - name: Install "{{ target_service }}"
+    yum:
+            name: "{{ target_service }}"
+            state: latest
+
+  - name: create index.html file with file module
+    file:
+            name: /var/www/html/index.html
+            state: touch
+  - name: add text to the created file with lineinfile module
+    lineinfile:
+            line: "{{ ansible_hostname }}" 
+            path: /var/www/html/index.html
+  - name: Start httpd service with service module
+    service:
+            name: "{{ target_service }}"
+            state: started
+            
+###############################################################################################################
+--- # Service install using handlers # ansible-playbook -i playbookinv playbook1.yaml -e "target_service=httpd # "notify" should be used to inform the "handler" to perform task. handler task will not be performed without notifyer msg
+
+
+- hosts: play1
+  become: yes
+
+  tasks:
+  - name: Install "{{ target_service }}"
+    yum:
+            name: "{{ target_service }}"
+            state: latest
+    notify:
+      - restart httpd
+
+  - name: create index.html file with file module
+    file:
+            name: /var/www/html/index.html
+            state: touch
+  - name: add text to the created file with lineinfile module
+    lineinfile:
+            line: "{{ ansible_hostname }}" 
+            path: /var/www/html/index.html
+    notify:
+      -restart httpd
+  - name: handler
+  handlers:
+  - name: restart httpd
+    service:
+      name:httpd
+      state: restarted
+      listen: "restart httpd"
+
+
+
+- hosts: play2
+  become: yes
+
+  tasks:
+  - name: Install "{{ target_service }}"
+    yum:
+            name: "{{ target_service }}"
+            state: latest
+
+  - name: create index.html file with file module
+    file:
+            name: /var/www/html/index.html
+            state: touch
+  - name: add text to the created file with lineinfile module
+    lineinfile:
+            line: "{{ ansible_hostname }}" 
+            path: /var/www/html/index.html
+  - name: Start httpd service with service module
+    service:
+            name: "{{ target_service }}"
+            state: started
+            
+            
+            
+####################################################################
+--- # Project - install git
+
+- hosts: awshosts
+  become: yes
+
+  tasks:
+
+  - name: Copy file with specific and permissions
+    ansible.builtin.copy:
+      src: /home/ec2-user/git.tar
+      dest: /var
+      owner: root
+      group: root
+      mode: '0644'
+      
+  - name: list the result
+    ansible.builtin.shell:
+      cmd: ls -l
+      chdir: /var/
+      stdout: /var/git.txt 
+      
+####################################################################
+--- # Project - install git ##### Steps - Check if folder is present, copy tar, untar, delete tar, list folder,
+
+- hosts: awshosts
+  become: yes
+
+  tasks:
+
+  - name: Copy file with specific and permissions
+    ansible.builtin.copy:
+      src: /home/ec2-user/git.tar
+      dest: /var
+      owner: root
+      group: root
+      mode: '0644'
+
+  - name: Check Date with Shell command
+    shell:
+            "ls -l /var/git.tar"
+    register: lscmd
+    tags: lscmd
+
+  - debug: msg="{{lscmd.stdout}}"
+
