@@ -1,0 +1,17 @@
+--- # Project - install git ##### Steps - Check if folder is present, copy tar, untar, delete tar, list folder,
+
+- hosts: awshosts
+  become: yes
+
+  tasks:
+
+
+  - name: Remove archive
+    ansible.builtin.file:
+      path: /var/git.tar
+      state: absent
+
+  - name: Remove dir
+    ansible.builtin.file:
+      path: /var/git-2.6.4/
+      state: absent

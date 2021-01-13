@@ -20,3 +20,15 @@
     tags: lscmd
 
   - debug: msg="{{lscmd.stdout}}"
+
+  - name: Unarchive the Git
+    ansible.builtin.unarchive:
+      src: /var/git.tar
+      dest: /var/
+      remote_src: yes
+
+  - name: Remove file (delete file)
+    ansible.builtin.file:
+      path: /var/git.tar
+      state: absent
+
