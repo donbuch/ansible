@@ -1,6 +1,6 @@
---- # Project - install git ##### Steps - Check if folder is present, copy tar, untar, delete tar, list folder,
+--- # Project - install git-2.6.4 for Cip Instances ##### run with ansible-playbook -i [path] [path to playbook/GitforCipPlay.yaml] ####### Steps - copy tar, untar, delete tar, list folder,
 
-- hosts: awshosts
+- hosts: target
   become: yes
 
   tasks:
