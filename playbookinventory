@@ -1,0 +1,5 @@
+[awshosts]
+#ans1
+play1 ansible_host=ec2-34-242-231-125.eu-west-1.compute.amazonaws.com
+#ans2
+play2 ansible_host=ec2-52-215-224-20.eu-west-1.compute.amazonaws.com
