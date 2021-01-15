@@ -268,3 +268,21 @@
 
   - debug: msg="{{lscmd.stdout}}"
 
+--- # Example - Stop job if file exist
+ 
+ - hosts: awshosts
+   become: yes
+   tasks:
+   
+
+     - name: Check that the proper git version exists
+       stat:
+         path: /var/git-2.6.4/bin/git
+       register: git
+
+    
+     - debug: msg="{{git.stat.exists}}"
+
+     - name: Stop if git i already on host
+       fail: msg="Git is already installed"
+       when: git.stat.exists
